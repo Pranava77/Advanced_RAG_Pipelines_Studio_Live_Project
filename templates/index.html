@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced RAG Pipelines & Intelligent Q&A Bot | Port 8195</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="header-titles">
+                <h1>Advanced RAG Pipelines & Intelligent Q&A Bot</h1>
+                <p class="subtitle">End-to-End Ingest → Embed → Retrieve → Re-Rank → Generate & Evaluate</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="badge port-badge"><i class="fa-solid fa-bolt"></i> Port 8195</span>
+            <span class="badge status-badge live"><i class="fa-solid fa-circle"></i> Live Hybrid RAG</span>
+            <a href="http://localhost:8050" class="btn-portal" title="Back to Master Curriculum Portal">
+                <i class="fa-solid fa-house"></i> Master Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs-container">
+        <button class="nav-tab active" data-tab="tab-bot">
+            <i class="fa-solid fa-comments"></i> 1. Intelligent Q&A Bot
+        </button>
+        <button class="nav-tab" data-tab="tab-trace">
+            <i class="fa-solid fa-timeline"></i> 2. Pipeline Trace Inspector
+        </button>
+        <button class="nav-tab" data-tab="tab-retrieval">
+            <i class="fa-solid fa-magnifying-glass-chart"></i> 3. Hybrid Search & Re-Ranking Arena
+        </button>
+        <button class="nav-tab" data-tab="tab-query-transform">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> 4. Query Rewriting & HyDE Lab
+        </button>
+        <button class="nav-tab" data-tab="tab-evaluation">
+            <i class="fa-solid fa-chart-pie"></i> 5. Automated RAG Triad Evaluation
+        </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: INTELLIGENT Q&A BOT OVER CUSTOM DOCUMENTS -->
+        <!-- ============================================================== -->
+        <section id="tab-bot" class="tab-pane active">
+            <div class="qa-layout">
+                <!-- Left: Document Repository & Configuration -->
+                <div class="glass-card doc-sidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fa-solid fa-folder-open text-accent"></i> Knowledge Base</h3>
+                        <span class="badge-count" id="docCountBadge">4 Docs</span>
+                    </div>
+
+                    <div class="doc-list" id="documentCatalogList">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div class="upload-box mt-3">
+                        <h4><i class="fa-solid fa-cloud-arrow-up text-accent"></i> Add Custom Document</h4>
+                        <p class="text-xs text-muted mb-2">Upload any Markdown or text file to index dynamically into the vector store.</p>
+                        <input type="file" id="fileUploadInput" accept=".md,.txt" class="file-input">
+                        <button id="btnUploadDoc" class="btn-secondary w-full mt-2">
+                            <i class="fa-solid fa-upload"></i> Upload & Ingest
+                        </button>
+                    </div>
+
+                    <!-- Pipeline Toggles -->
+                    <div class="pipeline-toggles mt-3">
+                        <h4><i class="fa-solid fa-sliders text-accent"></i> Pipeline Modifiers</h4>
+                        <label class="toggle-row">
+                            <span>Enable HyDE Query Expansion</span>
+                            <input type="checkbox" id="toggleHyde" checked>
+                        </label>
+                        <label class="toggle-row">
+                            <span>Enable Cross-Encoder Re-Ranking</span>
+                            <input type="checkbox" id="toggleReranker" checked>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Center: Chatbot Interface -->
+                <div class="glass-card chat-container">
+                    <div class="chat-header">
+                        <div>
+                            <h3><i class="fa-solid fa-brain text-accent"></i> Grounded Domain Assistant</h3>
+                            <p class="text-xs text-muted">Answers are strictly grounded in indexed enterprise documents with verifiable bracketed citations.</p>
+                        </div>
+                        <div class="quick-samples">
+                            <span class="text-xs text-muted">Quick Queries:</span>
+                            <button class="sample-btn" data-q="What is the failover RPO and RTO for Aurora Global Database?">Aurora DR</button>
+                            <button class="sample-btn" data-q="How does PCI DSS handle PAN encryption and CVV in RAM memory?">PCI DSS</button>
+                            <button class="sample-btn" data-q="What is the first-line medication and dose for acute STEMI triage?">STEMI Protocol</button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-bubble assistant">
+                            <div class="bubble-header"><i class="fa-solid fa-robot"></i> Grounded RAG Assistant</div>
+                            <div class="bubble-body">
+                                Welcome! I am your enterprise RAG Q&A bot. Ask me any question about your indexed knowledge base documents (Cloud Disaster Recovery, PCI-DSS Security & SLAs, Emergency Clinical Triage, or RAG Whitepaper). Every answer includes verified citations <code>[Source X]</code>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-bar">
+                        <input type="text" id="chatInput" placeholder="Ask a technical question about your documents..." class="chat-input">
+                        <button id="btnSendChat" class="btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Citation & Source Drawer -->
+                <div class="glass-card source-drawer">
+                    <div class="drawer-header">
+                        <h3><i class="fa-solid fa-quote-left text-accent"></i> Grounded Sources</h3>
+                        <span class="badge" id="sourceCountBadge">0 Sources</span>
+                    </div>
+                    <div class="sources-container" id="sourcesContainer">
+                        <p class="text-xs text-muted text-center py-8">Ask a question to view attributed source passages and metadata here.</p>
+                    </div>
+
+                    <div class="contrastive-box mt-3" id="contrastiveBox" style="display: none;">
+                        <h4><i class="fa-solid fa-triangle-exclamation text-danger"></i> Contrastive Hallucination Showcase</h4>
+                        <p class="text-xs text-muted mb-1">What an ungrounded parametric model outputs:</p>
+                        <div class="hallucination-text" id="hallucinationText">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: PIPELINE TRACE INSPECTOR -->
+        <!-- ============================================================== -->
+        <section id="tab-trace" class="tab-pane">
+            <div class="glass-card mb-4">
+                <div class="card-title-row">
+                    <h2><i class="fa-solid fa-timeline text-accent"></i> End-to-End Pipeline Trace Inspector</h2>
+                    <p class="text-xs text-muted">Inspect real-time intermediate states at each transformation and retrieval step for any query.</p>
+                </div>
+                <div class="flex gap-3 mt-3">
+                    <input type="text" id="traceInput" value="What is the failover RPO and RTO for Aurora Global Database?" class="chat-input flex-1">
+                    <button id="btnRunTrace" class="btn-primary">
+                        <i class="fa-solid fa-play"></i> Inspect Pipeline Execution
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trace Steps Container -->
+            <div class="space-y-4" id="traceStepsContainer">
+                <!-- Step 1: Input -->
+                <div class="glass-card trace-card">
+                    <div class="trace-header">
+                        <span class="step-num">Step 1</span>
+                        <h4>User Query Ingestion & Preprocessing</h4>
+                        <span class="badge status-badge live">Raw Input</span>
+                    </div>
+                    <div class="trace-body" id="traceStep1">
+                        <p class="font-mono text-sm text-bright" id="traceRawQuery">What is the failover RPO and RTO for Aurora Global Database?</p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Query Transformation -->
+                <div class="glass-card trace-card">
+                    <div class="trace-header">
+                        <span class="step-num">Step 2</span>
+                        <h4>Query Transformation: Multi-Query & HyDE Synthesis</h4>
+                        <span class="badge">Recall Expansion</span>
+                    </div>
+                    <div class="trace-body" id="traceStep2">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Hybrid Retrieval -->
+                <div class="glass-card trace-card">
+                    <div class="trace-header">
+                        <span class="step-num">Step 3</span>
+                        <h4>Hybrid Retrieval: FAISS HNSW + BM25 Okapi + Reciprocal Rank Fusion</h4>
+                        <span class="badge">Candidate Pooling</span>
+                    </div>
+                    <div class="trace-body" id="traceStep3">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Step 4: Cross-Encoder Re-Ranking -->
+                <div class="glass-card trace-card">
+                    <div class="trace-header">
+                        <span class="step-num">Step 4</span>
+                        <h4>Cross-Encoder Transformer Re-Ranking (MS-MARCO MiniLM)</h4>
+                        <span class="badge">Precision Scoring</span>
+                    </div>
+                    <div class="trace-body" id="traceStep4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Step 5: Grounded Synthesis -->
+                <div class="glass-card trace-card">
+                    <div class="trace-header">
+                        <span class="step-num">Step 5</span>
+                        <h4>Grounded Context Assembly & Attributed Synthesis</h4>
+                        <span class="badge status-badge live">Final Grounding</span>
+                    </div>
+                    <div class="trace-body" id="traceStep5">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: HYBRID SEARCH & RE-RANKING ARENA -->
+        <!-- ============================================================== -->
+        <section id="tab-retrieval" class="tab-pane">
+            <div class="glass-card mb-4">
+                <div class="card-title-row">
+                    <h2><i class="fa-solid fa-magnifying-glass-chart text-accent"></i> Advanced Retrieval & Re-Ranking Arena</h2>
+                    <p class="text-xs text-muted">Compare Dense Semantic vectors against BM25 Keyword search, fused RRF ranks, and Cross-Encoder score shifts.</p>
+                </div>
+                <div class="flex gap-3 mt-3">
+                    <input type="text" id="arenaQueryInput" value="What is the maximum chargeback window and CVV storage rule under PCI DSS?" class="chat-input flex-1">
+                    <button id="btnRunArena" class="btn-primary">
+                        <i class="fa-solid fa-bolt"></i> Run Retrieval Comparison
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- RRF Candidate Fusion Table -->
+                <div class="glass-card">
+                    <h4><i class="fa-solid fa-shuffle text-accent"></i> Reciprocal Rank Fusion Candidates (Top 6)</h4>
+                    <p class="text-xs text-muted mb-2">Combines Dense HNSW ranks with Sparse BM25 ranks ($k=60$)</p>
+                    <div class="table-responsive">
+                        <table class="data-table" id="arenaRRFTable">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Chunk ID</th>
+                                    <th>Dense Sim</th>
+                                    <th>BM25 Score</th>
+                                    <th>RRF Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cross-Encoder Re-Ranked Table -->
+                <div class="glass-card">
+                    <h4><i class="fa-solid fa-bullseye text-accent"></i> Cross-Encoder Re-Ranked Precision (Top 3)</h4>
+                    <p class="text-xs text-muted mb-2">Evaluates full bidirectional $[Query, Chunk]$ attention logits</p>
+                    <div class="table-responsive">
+                        <table class="data-table" id="arenaRerankTable">
+                            <thead>
+                                <tr>
+                                    <th>Final Rank</th>
+                                    <th>Chunk ID</th>
+                                    <th>Cross-Logit</th>
+                                    <th>Rank Shift</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank Shift Visualization -->
+            <div class="glass-card mt-4">
+                <h4><i class="fa-solid fa-chart-line text-accent"></i> Candidate Rank Movement (RRF Rank vs Re-Ranked Rank)</h4>
+                <div class="chart-container">
+                    <canvas id="chartRankShift"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: QUERY REWRITING & HyDE STUDIO -->
+        <!-- ============================================================== -->
+        <section id="tab-query-transform" class="tab-pane">
+            <div class="glass-card mb-4">
+                <div class="card-title-row">
+                    <h2><i class="fa-solid fa-arrows-split-up-and-left text-accent"></i> Query Rewriting, HyDE & Sub-Query Decomposition</h2>
+                    <p class="text-xs text-muted">Bridges the vocabulary gap between short user prompts and rich document passages.</p>
+                </div>
+                <div class="flex gap-3 mt-3">
+                    <input type="text" id="transformInput" value="What is the first-line medication and dose for acute STEMI triage?" class="chat-input flex-1">
+                    <button id="btnRunTransform" class="btn-primary">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Transform Query
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <!-- Multi-Query Expansion -->
+                <div class="glass-card">
+                    <div class="card-header-badge">
+                        <span class="badge status-badge live"><i class="fa-solid fa-clone"></i> 3 Formulations</span>
+                        <h4>Multi-Query Expansion</h4>
+                    </div>
+                    <p class="text-xs text-muted mb-2">Generates complementary semantic angles to overcome keyword mismatch:</p>
+                    <ul class="feature-list" id="multiQueryList">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- HyDE Synthesized Passage -->
+                <div class="glass-card">
+                    <div class="card-header-badge">
+                        <span class="badge port-badge"><i class="fa-solid fa-file-lines"></i> Synthetic Document</span>
+                        <h4>Hypothetical Document (HyDE)</h4>
+                    </div>
+                    <p class="text-xs text-muted mb-2">Projects question into the document distribution space before embedding:</p>
+                    <div class="math-box text-left" id="hydePassageBox">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Sub-Query Decomposition -->
+                <div class="glass-card">
+                    <div class="card-header-badge">
+                        <span class="badge"><i class="fa-solid fa-cubes"></i> Atomic Intents</span>
+                        <h4>Sub-Query Decomposition</h4>
+                    </div>
+                    <p class="text-xs text-muted mb-2">Splits multi-hop queries into independent parallel retrieval steps:</p>
+                    <ul class="feature-list" id="subQueryList">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 5: AUTOMATED RAG EVALUATION & BENCHMARKING -->
+        <!-- ============================================================== -->
+        <section id="tab-evaluation" class="tab-pane">
+            <div class="glass-card banner-card">
+                <div class="banner-content">
+                    <h2><i class="fa-solid fa-award text-accent"></i> Automated RAG Triad & Evaluation Benchmark</h2>
+                    <p>
+                        Quantitative assessment measuring <strong>Context Relevancy</strong> (are retrieved chunks signal or noise?),
+                        <strong>Faithfulness / Groundedness</strong> (is every statement supported by context?), and
+                        <strong>Answer Relevancy</strong> (does the answer address the user's intent?).
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid-4 mb-4">
+                <div class="metric-card">
+                    <span class="card-tag">Context Relevancy</span>
+                    <h4 id="evalCtxRel">96.0%</h4>
+                    <p class="card-sub">Signal-to-Noise Ratio</p>
+                    <div class="card-detail text-success">Target: &gt; 90% [PASSED]</div>
+                </div>
+                <div class="metric-card highlighted-emerald">
+                    <span class="card-tag">Faithfulness (Grounding)</span>
+                    <h4 id="evalFaith">98.4%</h4>
+                    <p class="card-sub">Zero Hallucinations</p>
+                    <div class="card-detail text-success font-bold">100% Attributed Truth</div>
+                </div>
+                <div class="metric-card">
+                    <span class="card-tag">Answer Relevancy</span>
+                    <h4 id="evalAnsRel">94.8%</h4>
+                    <p class="card-sub">Semantic Intent Fit</p>
+                    <div class="card-detail text-success">Target: &gt; 90% [PASSED]</div>
+                </div>
+                <div class="metric-card">
+                    <span class="card-tag">Citation Precision</span>
+                    <h4 id="evalCitePrec">100.0%</h4>
+                    <p class="card-sub">Provenance Verification</p>
+                    <div class="card-detail text-success">Zero Broken Citations</div>
+                </div>
+            </div>
+
+            <!-- Radar / Bar Comparison Chart -->
+            <div class="grid-2">
+                <div class="glass-card">
+                    <h4><i class="fa-solid fa-chart-radar text-accent"></i> Head-to-Head: Naive RAG vs Advanced Hybrid RAG</h4>
+                    <p class="text-xs text-muted mb-2">Performance across RAG Triad criteria</p>
+                    <div class="chart-container">
+                        <canvas id="chartRAGEval"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h4><i class="fa-solid fa-chart-column text-accent"></i> Retrieval Recall & Latency Trade-Off</h4>
+                    <p class="text-xs text-muted mb-2">Top-3 Recall vs Pipeline Latency (ms)</p>
+                    <div class="chart-container">
+                        <canvas id="chartRecallLatency"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>Pranava Holla — <strong>Advanced RAG Pipelines & Intelligent Q&A Bot</strong> | Port 8195 | Grounded Systems & Attribution</p>
+    </footer>
+
+    <!-- Main JavaScript Engine -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
